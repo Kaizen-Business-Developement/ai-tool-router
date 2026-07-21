@@ -1,0 +1,897 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Tool Router — Profit Mind AI</title>
+<meta name="description" content="No single AI does everything. A simple router for using Perplexity, Profit Mind AI, Claude and ChatGPT together — each for what it's best at, with Profit Mind AI owning the business decisions the others can't.">
+<meta property="og:title" content="AI Tool Router — Profit Mind AI">
+<meta property="og:description" content="Which AI should you open? A router for using Perplexity, Profit Mind AI, Claude and ChatGPT together — each for what it's best at.">
+<meta property="og:type" content="website">
+<style>
+/* ============================================================
+   Profit Mind AI — Shared Site Styles
+   Brand (from logo): near-black + electric blue→violet gradient,
+   white text, subtle gold $ accent. Premium AI/tech aesthetic.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+:root {
+  /* Surfaces */
+  --pm-dark: #07070d;        /* page background */
+  --pm-dark-2: #0c0c16;      /* panels / footer */
+  --pm-card: rgba(255,255,255,0.035);
+  --pm-card-border: rgba(255,255,255,0.09);
+
+  /* Brand accents (logo) */
+  --pm-blue: #4f7cff;
+  --pm-blue-bright: #6f9bff;
+  --pm-purple: #a855f7;
+  --pm-purple-bright: #c08bff;
+  --pm-grad: linear-gradient(135deg, #4f7cff 0%, #a855f7 100%);
+  --pm-grad-soft: linear-gradient(135deg, rgba(79,124,255,0.16), rgba(168,85,247,0.16));
+
+  /* Legacy names kept so existing inline styles keep working */
+  --pm-green: #4f7cff;       /* repurposed → blue */
+  --pm-gold: #4f7cff;        /* primary accent → blue */
+  --pm-gold-light: #c08bff;  /* light accent → violet */
+  --pm-price: #ecc457;       /* warm gold, echoes the logo $ — prices only */
+
+  --pm-white: #ffffff;
+  --pm-red: #ef5d52;
+  --pm-text: rgba(255,255,255,0.92);
+  --pm-muted: rgba(255,255,255,0.6);
+  --pm-muted-2: rgba(255,255,255,0.4);
+  --pm-maxw: 1120px;
+
+  --pm-radius: 16px;
+  --pm-shadow: 0 24px 60px -24px rgba(0,0,0,0.7);
+  --pm-glow: 0 12px 40px -8px rgba(79,124,255,0.45);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--pm-dark);
+  background-image:
+    radial-gradient(900px 540px at 78% -8%, rgba(168,85,247,0.16), transparent 60%),
+    radial-gradient(820px 520px at 12% 2%, rgba(79,124,255,0.16), transparent 58%);
+  background-repeat: no-repeat;
+  font-family: 'Inter', system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: var(--pm-text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+a { color: inherit; }
+img { max-width: 100%; display: block; }
+::selection { background: rgba(79,124,255,0.35); }
+
+.wrap { max-width: var(--pm-maxw); margin: 0 auto; padding: 0 24px; }
+.wrap-narrow { max-width: 820px; margin: 0 auto; padding: 0 24px; }
+
+.skip-link {
+  position: absolute; left: -9999px; top: 0; background: var(--pm-blue);
+  color: #fff; padding: 10px 16px; z-index: 200; border-radius: 0 0 8px 0; font-weight: 600;
+}
+.skip-link:focus { left: 0; }
+
+/* ── Navbar ── */
+.nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(8,8,16,0.72);
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.nav-inner {
+  max-width: var(--pm-maxw); margin: 0 auto;
+  padding: 13px 24px; display: flex; align-items: center; gap: 16px;
+}
+.nav-brand { display: flex; align-items: center; gap: 11px; text-decoration: none; flex-shrink: 0; }
+.nav-logo { width: 36px; height: 36px; border-radius: 9px; object-fit: cover; }
+.nav-brand-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 15px; font-weight: 600; letter-spacing: 0.04em;
+  text-transform: uppercase; color: #fff;
+}
+.nav-links { display: flex; align-items: center; gap: 2px; margin-left: auto; }
+.nav-link {
+  font-size: 14px; color: rgba(255,255,255,0.66); text-decoration: none;
+  padding: 8px 13px; border-radius: 9px; transition: color .15s, background .15s;
+}
+.nav-link:hover { color: #fff; background: rgba(255,255,255,0.06); }
+.nav-link.active { color: #fff; }
+.nav-cta {
+  background: var(--pm-grad); color: #fff !important;
+  font-weight: 600; padding: 10px 20px; border-radius: 10px;
+  text-decoration: none; font-size: 14px; margin-left: 10px;
+  box-shadow: 0 8px 24px -10px rgba(79,124,255,0.7); transition: transform .15s, box-shadow .15s;
+}
+.nav-cta:hover { transform: translateY(-1px); box-shadow: 0 12px 30px -10px rgba(168,85,247,0.8); }
+.nav-toggle {
+  display: none; background: none; border: none; cursor: pointer;
+  margin-left: auto; color: #fff; font-size: 24px; line-height: 1;
+}
+
+/* ── Buttons ── */
+.btn-primary {
+  display: inline-block; background: var(--pm-grad); color: #fff;
+  border: none; border-radius: 11px; padding: 15px 30px;
+  font-size: 15px; font-weight: 600; cursor: pointer; text-decoration: none;
+  font-family: inherit; letter-spacing: 0.01em;
+  box-shadow: 0 12px 32px -12px rgba(79,124,255,0.75);
+  transition: transform .15s, box-shadow .15s, filter .15s;
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 18px 40px -12px rgba(168,85,247,0.85); filter: brightness(1.06); }
+.btn-secondary {
+  display: inline-block; background: rgba(255,255,255,0.04); color: #fff;
+  border: 1px solid rgba(255,255,255,0.16); border-radius: 11px; padding: 15px 30px;
+  font-size: 15px; font-weight: 500; cursor: pointer; text-decoration: none;
+  font-family: inherit; transition: background .15s, border-color .15s, transform .15s;
+}
+.btn-secondary:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.3); transform: translateY(-2px); }
+.btn-row { display: flex; flex-wrap: wrap; gap: 14px; }
+.btn-row.center { justify-content: center; }
+
+/* ── Sections & headings ── */
+.section { padding: 92px 0; }
+.section-tight { padding: 56px 0; }
+.center { text-align: center; }
+
+.kicker {
+  display: inline-block;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--pm-purple-bright); margin-bottom: 14px;
+}
+.h1 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(38px, 5.4vw, 60px); font-weight: 700; line-height: 1.05;
+  letter-spacing: -0.02em; margin-bottom: 20px;
+}
+.h1 span {
+  background: var(--pm-grad); -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent;
+}
+.h2 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(27px, 3.4vw, 38px); font-weight: 600; line-height: 1.15;
+  letter-spacing: -0.02em; margin-bottom: 16px;
+}
+.h2 span {
+  background: var(--pm-grad); -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent;
+}
+.h3 { font-family: 'Space Grotesk', sans-serif; font-size: 19px; font-weight: 600; margin-bottom: 8px; letter-spacing: -0.01em; }
+.lead { font-size: 18px; color: var(--pm-muted); max-width: 640px; line-height: 1.65; }
+.center .lead, .lead.center { margin-left: auto; margin-right: auto; }
+.lead.center { text-align: center; }
+.muted { color: var(--pm-muted); }
+
+/* Centered section intro — consistent across the whole site */
+.section-head { max-width: 680px; margin: 0 auto 48px; text-align: center; }
+
+.divider {
+  width: 60px; height: 3px; border-radius: 3px;
+  background: var(--pm-grad); margin: 26px auto;
+}
+.section-break {
+  height: 1px; max-width: var(--pm-maxw); margin: 0 auto;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+}
+
+/* ── Hero ── */
+.hero {
+  position: relative; padding: 104px 0 92px; text-align: center; overflow: hidden;
+}
+.hero::before {
+  content: ""; position: absolute; left: 50%; top: -10%; transform: translateX(-50%);
+  width: 760px; height: 520px; pointer-events: none; z-index: 0;
+  background: radial-gradient(closest-side, rgba(79,124,255,0.22), transparent 70%),
+              radial-gradient(closest-side, rgba(168,85,247,0.18), transparent 72%);
+  filter: blur(8px);
+}
+.hero > .wrap { position: relative; z-index: 1; }
+.hero .lead { font-size: 19px; max-width: 660px; }
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 12.5px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: #fff; background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.14); padding: 7px 16px; border-radius: 999px; margin-bottom: 26px;
+}
+.hero-eyebrow::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--pm-grad); box-shadow: 0 0 10px rgba(79,124,255,0.9); }
+.hero .btn-row { margin-top: 34px; }
+.price-tag {
+  display: inline-block; margin-top: 26px;
+  font-size: 15px; color: var(--pm-muted);
+}
+.price-tag strong { font-size: 23px; color: var(--pm-price); font-family: 'Space Grotesk', sans-serif; }
+
+/* ── Card grids ── */
+.grid { display: grid; gap: 20px; }
+.grid-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+.card {
+  position: relative; background: var(--pm-card); border: 1px solid var(--pm-card-border);
+  border-radius: var(--pm-radius); padding: 28px 26px; transition: transform .18s, border-color .18s, background .18s;
+}
+.card:hover { transform: translateY(-4px); border-color: rgba(126,140,255,0.45); background: rgba(255,255,255,0.05); }
+.card h3 { font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 600; margin-bottom: 9px; }
+.card p { font-size: 14.5px; color: var(--pm-muted); line-height: 1.65; }
+
+/* offer cards */
+.offer-card { display: flex; flex-direction: column; text-align: left; }
+.offer-card::before {
+  content: ""; position: absolute; inset: 0; border-radius: var(--pm-radius); padding: 1px;
+  background: var(--pm-grad); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude; opacity: 0; transition: opacity .18s; pointer-events: none;
+}
+.offer-card:hover::before { opacity: 1; }
+.offer-card .price { font-family: 'Space Grotesk', sans-serif; font-size: 26px; font-weight: 700; color: var(--pm-price); margin: 4px 0 16px; }
+.offer-card .price span { font-size: 14px; font-weight: 500; color: var(--pm-muted); }
+.offer-card ul { list-style: none; margin: 0 0 24px; padding: 0; }
+.offer-card li { font-size: 14.5px; color: rgba(255,255,255,0.78); padding: 7px 0 7px 26px; position: relative; }
+.offer-card li::before { content: "✓"; position: absolute; left: 0; color: var(--pm-blue-bright); font-weight: 700; }
+.offer-card .btn-primary, .offer-card .btn-secondary { margin-top: auto; text-align: center; }
+
+/* steps */
+.step-card { position: relative; padding-left: 62px; text-align: left; }
+.step-card .num {
+  position: absolute; left: 0; top: 0;
+  width: 44px; height: 44px; border-radius: 12px;
+  background: var(--pm-grad-soft); border: 1px solid rgba(126,140,255,0.4);
+  color: #fff; font-weight: 700; font-size: 17px; font-family: 'Space Grotesk', sans-serif;
+  display: grid; place-items: center;
+}
+
+/* brain roster */
+.brain-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.brain {
+  background: var(--pm-card); border: 1px solid var(--pm-card-border);
+  border-radius: 14px; padding: 20px; transition: transform .18s, border-color .18s, background .18s;
+}
+.brain:hover { transform: translateY(-3px); border-color: rgba(126,140,255,0.45); background: rgba(255,255,255,0.05); }
+.brain .tag {
+  font-family: 'Space Grotesk', sans-serif; font-size: 10.5px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--pm-purple-bright);
+}
+.brain h3 { font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 600; margin: 5px 0 7px; }
+.brain p { font-size: 13.5px; color: var(--pm-muted); line-height: 1.6; }
+
+/* check list */
+.check-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 13px; text-align: left; }
+.check-list li { position: relative; padding-left: 32px; font-size: 15.5px; color: rgba(255,255,255,0.82); }
+.check-list li::before {
+  content: "✓"; position: absolute; left: 0; top: 0; color: #fff; font-weight: 700; font-size: 13px;
+  width: 21px; height: 21px; border-radius: 7px; background: var(--pm-grad-soft);
+  border: 1px solid rgba(126,140,255,0.4); display: grid; place-items: center;
+}
+.x-list li::before { content: "✕"; color: var(--pm-red); background: rgba(239,93,82,0.12); border-color: rgba(239,93,82,0.4); }
+
+/* two-column — balanced and intentional */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+.two-col .lead { max-width: none; }
+
+/* video / testimonial strip */
+.video-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.video-card {
+  background: var(--pm-card); border: 1px solid var(--pm-card-border);
+  border-radius: var(--pm-radius); overflow: hidden; transition: transform .18s, border-color .18s;
+}
+.video-card:hover { transform: translateY(-4px); border-color: rgba(126,140,255,0.45); }
+.video-embed { position: relative; aspect-ratio: 9 / 16; background: #05050a; }
+.video-embed video, .video-embed iframe {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border: 0;
+}
+.video-card .quote { padding: 16px 18px 4px; font-size: 14.5px; color: rgba(255,255,255,0.82); font-style: italic; }
+.video-card .who {
+  padding: 12px 18px 18px; font-size: 14px; font-weight: 600;
+  font-family: 'Space Grotesk', sans-serif; color: var(--pm-purple-bright);
+}
+
+.video-placeholder {
+  position: absolute; inset: 0; display: grid; place-items: center; text-align: center;
+  color: var(--pm-muted); font-size: 13px; padding: 16px; background: var(--pm-dark-2);
+}
+.video-placeholder .play {
+  width: 54px; height: 54px; border-radius: 50%; margin: 0 auto 10px;
+  background: var(--pm-grad-soft); border: 1px solid rgba(126,140,255,0.45);
+  display: grid; place-items: center; color: #fff; font-size: 20px;
+}
+
+/* bios */
+.bio-card { display: flex; gap: 22px; align-items: flex-start; text-align: left; }
+.bio-photo {
+  width: 96px; height: 96px; border-radius: 16px; object-fit: cover; flex-shrink: 0;
+  background: var(--pm-grad-soft); border: 1px solid rgba(126,140,255,0.4);
+}
+.bio-card h3 { font-size: 20px; margin-bottom: 2px; }
+.bio-card .role {
+  font-family: 'Space Grotesk', sans-serif; font-size: 12px; color: var(--pm-purple-bright);
+  text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 11px;
+}
+.bio-card p { font-size: 14.5px; color: var(--pm-muted); line-height: 1.65; }
+.bio-card a { color: var(--pm-blue-bright); text-decoration: none; font-weight: 600; }
+.bio-card a:hover { text-decoration: underline; }
+
+/* ── FAQ accordion ── */
+.faq { max-width: 760px; margin: 0 auto; }
+.faq-item { border: 1px solid var(--pm-card-border); border-radius: 12px; margin-bottom: 12px; background: var(--pm-card); transition: border-color .18s; }
+.faq-item.open { border-color: rgba(126,140,255,0.45); }
+.faq-q {
+  width: 100%; background: none; border: none; cursor: pointer; text-align: left;
+  color: #fff; font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 500;
+  padding: 19px 52px 19px 22px; position: relative;
+}
+.faq-q::after {
+  content: "+"; position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
+  color: var(--pm-purple-bright); font-size: 22px; transition: transform .2s; font-weight: 400;
+}
+.faq-item.open .faq-q::after { content: "−"; }
+.faq-a { max-height: 0; overflow: hidden; transition: max-height .25s ease; }
+.faq-a p { padding: 0 22px 20px; font-size: 15px; color: var(--pm-muted); line-height: 1.7; }
+
+/* ── CTA band ── */
+.cta-band {
+  position: relative; text-align: center; padding: 84px 0; overflow: hidden;
+  background: var(--pm-dark-2);
+}
+.cta-band::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(620px 280px at 50% 0%, rgba(168,85,247,0.2), transparent 70%),
+              radial-gradient(620px 280px at 50% 100%, rgba(79,124,255,0.16), transparent 70%);
+  border-top: 1px solid rgba(255,255,255,0.07); border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.cta-band > .wrap { position: relative; z-index: 1; }
+
+/* ── Forms ── */
+.form-card {
+  position: relative; background: var(--pm-card); border: 1px solid var(--pm-card-border);
+  border-radius: 20px; padding: 32px 30px; max-width: 480px; margin: 0 auto;
+  box-shadow: var(--pm-shadow);
+}
+.lead-form label.field { display: block; margin-bottom: 16px; font-size: 13px; color: rgba(255,255,255,0.7); text-align: left; }
+.lead-form label.field span { display: block; margin-bottom: 7px; }
+.lead-form input[type=text],
+.lead-form input[type=email],
+.lead-form input[type=tel],
+.lead-form input[type=url] {
+  width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 10px; padding: 13px 14px; color: #fff; font-size: 15px; font-family: inherit;
+  transition: border-color .15s, box-shadow .15s;
+}
+.lead-form input:focus { outline: none; border-color: var(--pm-blue); box-shadow: 0 0 0 3px rgba(79,124,255,0.18); }
+.phone-row { display: grid; grid-template-columns: 92px 1fr; gap: 10px; }
+.consent { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--pm-muted); margin: 8px 0 18px; text-align: left; }
+.consent input { margin-top: 3px; flex-shrink: 0; accent-color: var(--pm-blue); }
+.consent a { color: var(--pm-blue-bright); }
+.lead-form button[type=submit] { width: 100%; }
+
+/* embed (calendar) */
+.embed-frame {
+  width: 100%; min-height: 720px; border: 1px solid var(--pm-card-border);
+  border-radius: var(--pm-radius); background: #fff; overflow: hidden; box-shadow: var(--pm-shadow);
+}
+.embed-frame iframe { width: 100%; min-height: 720px; border: 0; display: block; }
+
+/* ── Footer ── */
+.footer { border-top: 1px solid rgba(255,255,255,0.07); padding: 56px 0 44px; background: var(--pm-dark-2); }
+.footer-inner { max-width: var(--pm-maxw); margin: 0 auto; padding: 0 24px; }
+.footer-top { display: flex; flex-wrap: wrap; gap: 40px; justify-content: space-between; margin-bottom: 40px; }
+.footer-brand-col { max-width: 320px; }
+.footer-logo-row { display: flex; align-items: center; gap: 11px; margin-bottom: 14px; }
+.footer-logo { width: 34px; height: 34px; border-radius: 9px; }
+.footer-brand-name { font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: #fff; }
+.footer-tagline { font-size: 13.5px; color: var(--pm-muted-2); line-height: 1.65; }
+.footer-col h4 { font-family: 'Space Grotesk', sans-serif; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--pm-purple-bright); margin-bottom: 14px; }
+.footer-col a { display: block; font-size: 14px; color: rgba(255,255,255,0.58); text-decoration: none; padding: 5px 0; transition: color .15s; }
+.footer-col a:hover { color: #fff; }
+.footer-bottom { border-top: 1px solid rgba(255,255,255,0.06); padding-top: 24px; }
+.footer-contact { font-size: 13px; color: var(--pm-muted-2); margin-bottom: 10px; }
+.footer-contact a { color: var(--pm-blue-bright); text-decoration: none; }
+.footer-copy { font-size: 11.5px; color: rgba(255,255,255,0.3); line-height: 1.75; max-width: 760px; }
+
+/* ── Responsive ── */
+@media (max-width: 920px) {
+  .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .brain-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 760px) {
+  .nav-links {
+    position: absolute; top: 100%; left: 0; right: 0;
+    flex-direction: column; align-items: stretch; gap: 0;
+    background: var(--pm-dark-2); border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding: 10px 16px; display: none;
+  }
+  .nav-links.open { display: flex; }
+  .nav-link, .nav-cta { width: 100%; text-align: center; margin: 4px 0; }
+  .nav-toggle { display: block; }
+  .section { padding: 64px 0; }
+  .grid-2, .grid-3, .grid-4, .two-col, .video-strip { grid-template-columns: 1fr; }
+  .two-col { gap: 32px; }
+  .brain-grid { grid-template-columns: 1fr; }
+  .bio-card { flex-direction: column; }
+}
+
+</style>
+<style>
+  /* ===== AI Tool Router — page-scoped, dark-native, matches site brand ===== */
+  .router {
+    --pp: #4fc4cf; --pp-tint: rgba(79,196,207,.12); --pp-bd: rgba(79,196,207,.36);
+    --pm: #c08bff; --pm-tint: rgba(168,85,247,.15); --pm-bd: rgba(168,85,247,.42);
+    --cl: #e0895f; --cl-tint: rgba(224,137,95,.13); --cl-bd: rgba(224,137,95,.40);
+    --gp: #f2f3f7; --gp-tint: rgba(255,255,255,.07); --gp-bd: rgba(255,255,255,.24);
+  }
+  .router-card {
+    background: var(--pm-card); border: 1px solid var(--pm-card-border);
+    border-radius: 20px; padding: clamp(22px, 4vw, 34px);
+    max-width: 760px; margin: 0 auto; box-shadow: var(--pm-shadow);
+  }
+  .router-trail { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; min-height: 24px; margin: 0 auto 16px; max-width: 760px; }
+  .router-crumb { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--pm-muted); background: rgba(255,255,255,.04); border: 1px solid var(--pm-card-border); padding: 4px 10px; border-radius: 999px; }
+  .router-crumb b { color: #fff; font-weight: 600; }
+  .router-crumb .a { color: var(--pm-muted-2); }
+
+  .router .step-label { font-family: 'Space Grotesk', sans-serif; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--pm-purple-bright); font-weight: 600; margin: 0 0 10px; }
+  .router .q { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: clamp(20px, 3.4vw, 27px); line-height: 1.2; letter-spacing: -.01em; margin: 0 0 6px; color: #fff; }
+  .router .q-sub { color: var(--pm-muted); font-size: 14.5px; margin: 0 0 22px; }
+
+  .router .options { display: grid; gap: 12px; }
+  .router .opt { appearance: none; text-align: left; cursor: pointer; font-family: inherit; font-size: 15.5px; color: #fff; background: rgba(255,255,255,.035); border: 1px solid var(--pm-card-border); border-radius: 12px; padding: 15px 18px; display: flex; align-items: center; gap: 14px; transition: border-color .16s, background .16s, transform .14s; }
+  .router .opt:hover { border-color: rgba(126,140,255,.5); background: rgba(255,255,255,.06); transform: translateY(-1px); }
+  .router .opt:focus-visible { outline: 2px solid var(--pm-blue); outline-offset: 2px; }
+  .router .opt .txt { flex: 1; }
+  .router .opt .txt small { display: block; color: var(--pm-muted-2); font-size: 12.5px; margin-top: 2px; }
+  .router .opt .chev { color: var(--pm-muted-2); flex: none; transition: transform .16s, color .16s; }
+  .router .opt:hover .chev { transform: translateX(3px); color: var(--pm-purple-bright); }
+
+  .router .badge { font-family: 'Space Grotesk', sans-serif; font-size: 11.5px; letter-spacing: .12em; text-transform: uppercase; font-weight: 600; padding: 4px 11px; border-radius: 999px; color: var(--tool); background: var(--tool-tint); border: 1px solid var(--tool-bd); display: inline-block; }
+  .router .tool-name { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: clamp(26px, 5vw, 34px); letter-spacing: -.01em; margin: 14px 0 2px; color: var(--tool); }
+  .router .tool-name.grad { background: var(--pm-grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
+  .router .tool-tag { color: var(--pm-muted); font-size: 15px; margin: 0 0 16px; }
+  .router .mode { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--tool); background: var(--tool-tint); border: 1px solid var(--tool-bd); border-radius: 999px; padding: 5px 12px; margin: 0 0 18px; font-weight: 600; }
+  .router .why { background: var(--tool-tint); border-left: 3px solid var(--tool); border-radius: 0 12px 12px 0; padding: 14px 16px; font-size: 14.5px; margin: 0 0 20px; color: var(--pm-text); }
+  .router .why b { color: var(--tool); }
+  .router .examples { margin: 0; padding: 0; list-style: none; display: grid; gap: 9px; }
+  .router .examples li { display: flex; gap: 10px; font-size: 14px; color: var(--pm-muted); align-items: baseline; }
+  .router .examples li::before { content: ""; flex: none; width: 6px; height: 6px; border-radius: 2px; background: var(--tool); transform: translateY(3px); }
+  .router .examples li i { color: rgba(255,255,255,.86); font-style: normal; }
+
+  .router .chain { display: flex; align-items: stretch; flex-wrap: wrap; margin: 4px 0 20px; }
+  .router .chain-step { flex: 1 1 190px; border: 1px solid var(--pm-card-border); border-top: 3px solid var(--tool); border-radius: 12px; padding: 15px 16px; background: rgba(255,255,255,.03); }
+  .router .chain-step .ph { font-family: 'Space Grotesk', sans-serif; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--pm-muted-2); font-weight: 600; }
+  .router .chain-step h4 { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 19px; margin: 3px 0; color: var(--tool); }
+  .router .chain-step p { font-size: 13px; color: var(--pm-muted); }
+  .router .chain-arrow { display: flex; align-items: center; justify-content: center; color: var(--pm-muted-2); font-size: 20px; padding: 0 10px; flex: none; }
+  @media (max-width: 520px) { .router .chain { flex-direction: column; } .router .chain-arrow { transform: rotate(90deg); padding: 6px 0; } }
+
+  .router .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 24px; }
+  .router .rbtn { appearance: none; cursor: pointer; font-family: inherit; font-size: 14px; font-weight: 600; padding: 11px 18px; border-radius: 10px; border: 1px solid var(--pm-card-border); background: rgba(255,255,255,.04); color: #fff; transition: background .15s, transform .14s, border-color .15s; }
+  .router .rbtn:hover { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.3); transform: translateY(-1px); }
+  .router .rbtn:focus-visible { outline: 2px solid var(--pm-blue); outline-offset: 2px; }
+  .router .rbtn.primary { background: var(--pm-grad); border: none; box-shadow: 0 10px 28px -12px rgba(79,124,255,.75); }
+  .router .rbtn.primary:hover { filter: brightness(1.06); }
+
+  .router .stage { animation: rrise .32s cubic-bezier(.2,.7,.3,1); }
+  @keyframes rrise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .router .stage { animation: none; } .router .opt, .router .rbtn, .router .chev { transition: none; } }
+
+  /* reference blocks */
+  .router .hygiene { background: var(--pm-card); border: 1px solid var(--pm-card-border); border-left: 3px solid var(--pm-purple); border-radius: 0 16px 16px 0; padding: 22px 24px; max-width: 820px; margin: 0 auto; }
+  .router .hygiene .big { font-family: 'Space Grotesk', sans-serif; font-size: clamp(18px,3vw,23px); font-weight: 600; margin: 0 0 8px; letter-spacing: -.01em; color: #fff; }
+  .router .hygiene .big b { color: var(--pm-purple-bright); }
+  .router .hygiene p { margin: 0; font-size: 14.5px; color: var(--pm-muted); }
+
+  .router .relay { display: flex; align-items: stretch; flex-wrap: wrap; max-width: 900px; margin: 0 auto; }
+  .router .relay-step { flex: 1 1 160px; background: var(--pm-card); border: 1px solid var(--pm-card-border); border-top: 3px solid var(--tool); border-radius: 14px; padding: 15px 16px; }
+  .router .relay-step .ph { font-family: 'Space Grotesk', sans-serif; font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--pm-muted-2); font-weight: 600; }
+  .router .relay-step strong { display: block; color: var(--tool); font-family: 'Space Grotesk', sans-serif; font-size: 17px; margin: 3px 0 2px; }
+  .router .relay-step span { font-size: 12.5px; color: var(--pm-muted); }
+  .router .relay-step.grad strong { background: var(--pm-grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  .router .relay-arrow { display: flex; align-items: center; color: var(--pm-muted-2); font-size: 18px; padding: 0 8px; }
+  @media (max-width: 620px) { .router .relay { flex-direction: column; } .router .relay-arrow { transform: rotate(90deg); padding: 5px 0; } }
+  .router .sidecar { max-width: 900px; margin: 14px auto 0; font-size: 13.5px; color: var(--pm-muted); background: rgba(255,255,255,.03); border: 1px dashed rgba(255,255,255,.16); border-radius: 12px; padding: 12px 16px; }
+  .router .sidecar b { color: var(--pp); }
+
+  .router .loops { display: grid; gap: 12px; max-width: 820px; margin: 0 auto; }
+  .router .loop { background: var(--pm-card); border: 1px solid var(--pm-card-border); border-radius: 14px; padding: 16px 18px; }
+  .router .loop-flow { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+  .router .tag { display: inline-flex; align-items: center; font-family: 'Space Grotesk', sans-serif; font-size: 12.5px; font-weight: 600; padding: 3px 12px; border-radius: 999px; color: var(--tool); background: var(--tool-tint); border: 1px solid var(--tool-bd); }
+  .router .flow-a { color: var(--pm-muted-2); font-size: 14px; }
+  .router .loop p { font-size: 13.5px; color: var(--pm-muted); }
+  .router .loop p b { color: #fff; font-weight: 600; }
+
+  .router .lanes { display: grid; gap: 14px; grid-template-columns: 1fr 1fr; max-width: 900px; margin: 0 auto; }
+  @media (max-width: 620px) { .router .lanes { grid-template-columns: 1fr; } }
+  .router .lane { border: 1px solid var(--pm-card-border); border-left: 3px solid var(--tool); border-radius: 14px; padding: 17px 18px; background: var(--pm-card); }
+  .router .lane .top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+  .router .lane h3 { font-family: 'Space Grotesk', sans-serif; font-size: 17px; color: var(--tool); font-weight: 600; margin: 0 0 3px; }
+  .router .lane.grad h3 { background: var(--pm-grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  .router .lane .role { font-family: 'Space Grotesk', sans-serif; font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--pm-muted-2); font-weight: 600; }
+  .router .lane p { margin: 4px 0 0; font-size: 13px; color: var(--pm-muted); }
+  .router .lane .best { margin-top: 9px; font-size: 12px; color: var(--tool); font-weight: 600; }
+
+  .router .table-scroll { overflow-x: auto; max-width: 820px; margin: 0 auto; }
+  .router table.tbl { width: 100%; border-collapse: collapse; border: 1px solid var(--pm-card-border); border-radius: 14px; overflow: hidden; background: var(--pm-card); font-size: 14px; }
+  .router .tbl th, .router .tbl td { text-align: left; padding: 13px 16px; border-bottom: 1px solid var(--pm-card-border); }
+  .router .tbl thead th { font-family: 'Space Grotesk', sans-serif; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--pm-muted-2); font-weight: 600; background: rgba(255,255,255,.03); }
+  .router .tbl tr:last-child td { border-bottom: 0; }
+  .router .tbl td:last-child { text-align: right; white-space: nowrap; }
+  .router .pill { display: inline-block; font-family: 'Space Grotesk', sans-serif; padding: 2px 10px; border-radius: 999px; font-size: 12.5px; font-weight: 600; color: var(--tool); background: var(--tool-tint); border: 1px solid var(--tool-bd); }
+
+  @media print {
+    body { background: #fff !important; color: #111 !important; }
+    .nav, .cta-band, .router .actions, .router-trail, .router .chev { display: none !important; }
+    .router-card, .router .lane, .router .loop, .router .relay-step, .router .hygiene, .router table.tbl { box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<main id="main" class="router">
+
+  <!-- ===== HERO ===== -->
+  <section class="hero">
+    <div class="wrap">
+      <span class="hero-eyebrow">Tool Router</span>
+      <h1 class="h1">Which AI should<br>you <span>open</span>?</h1>
+      <p class="lead center">No single AI does everything. The operators who get the most out of AI use each tool for what it's best at — and let Profit Mind AI make the business decisions the others can't. Here's the map.</p>
+    </div>
+  </section>
+
+  <!-- ===== ROUTER ===== -->
+  <section class="section" style="padding-top:8px">
+    <div class="wrap">
+      <div class="router-trail" id="trail" aria-live="polite"></div>
+      <div class="router-card"><div id="stage" class="stage"></div></div>
+    </div>
+  </section>
+
+  <div class="section-break"></div>
+
+  <!-- ===== HYGIENE RULE ===== -->
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="kicker">The principle</p>
+        <h2 class="h2">One rule keeps it clean<span>.</span></h2>
+      </div>
+      <div class="hygiene">
+        <p class="big">If it's about you, not the business, <b>it goes to Perplexity.</b></p>
+        <p>Your business AIs — Profit Mind AI, Claude, ChatGPT — only ever see business context. Everything personal, and any throwaway fact-check, stays in Perplexity, out of their memory. That's the whole reason for the split.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-break"></div>
+
+  <!-- ===== RELAY ===== -->
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="kicker">How they work together</p>
+        <h2 class="h2">Your typical business flow<span>.</span></h2>
+        <p class="lead center">The tools relay — each hands off to the next.</p>
+      </div>
+      <div class="relay">
+        <div class="relay-step grad" style="--tool:var(--pm)"><span class="ph">Think</span><strong>Profit Mind AI</strong><span>Strategy &amp; planning, in a business frame.</span></div>
+        <div class="relay-arrow">→</div>
+        <div class="relay-step" style="--tool:var(--cl)"><span class="ph">Build</span><strong>Claude</strong><span>Turn the thinking into the actual work.</span></div>
+        <div class="relay-arrow">→</div>
+        <div class="relay-step" style="--tool:var(--gp)"><span class="ph">Offload</span><strong>ChatGPT</strong><span>Long research, running in the background.</span></div>
+      </div>
+      <p class="sidecar"><b>Perplexity</b> sits off to the side — the personal AI and quick fact-checker, kept out of the business AIs' memory.</p>
+    </div>
+  </section>
+
+  <div class="section-break"></div>
+
+  <!-- ===== LOOPS ===== -->
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="kicker">In practice</p>
+        <h2 class="h2">The loops you actually run<span>.</span></h2>
+        <p class="lead center">Real work bounces between tools. These are the common round-trips.</p>
+      </div>
+      <div class="loops">
+        <div class="loop">
+          <div class="loop-flow">
+            <span class="tag" style="--tool:var(--pm)">Profit Mind AI</span><span class="flow-a">→</span>
+            <span class="tag" style="--tool:var(--pp)">Perplexity</span><span class="flow-a">→</span>
+            <span class="tag" style="--tool:var(--cl)">Claude</span>
+          </div>
+          <p><b>Strategise → verify → build.</b> A plan makes a claim; check the number or market fact before you commit, then build it out.</p>
+        </div>
+        <div class="loop">
+          <div class="loop-flow">
+            <span class="tag" style="--tool:var(--gp)">ChatGPT</span><span class="flow-a">→</span>
+            <span class="tag" style="--tool:var(--cl)">Claude</span>
+          </div>
+          <p><b>Research → build.</b> Set the deep research running, then bring the findings into Claude to actually make something with them.</p>
+        </div>
+        <div class="loop">
+          <div class="loop-flow">
+            <span class="tag" style="--tool:var(--cl)">Claude</span><span class="flow-a">→</span>
+            <span class="tag" style="--tool:var(--pm)">Profit Mind AI</span><span class="flow-a">→</span>
+            <span class="tag" style="--tool:var(--cl)">Claude</span>
+          </div>
+          <p><b>Build → rethink → build.</b> Mid-build you hit a strategic fork — step out to Profit Mind AI for the call, then back to Claude to carry on.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-break"></div>
+
+  <!-- ===== LANES ===== -->
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="kicker">The stack at a glance</p>
+        <h2 class="h2">What each tool is for<span>.</span></h2>
+      </div>
+      <div class="lanes">
+        <div class="lane" style="--tool:var(--pp)">
+          <div class="top"><h3>Perplexity</h3><span class="role">Personal</span></div>
+          <p>Random questions, health, shopping, travel, curiosity — plus quick sourced fact-checks on either side.</p>
+          <div class="best">Best for: fast, cited answers</div>
+        </div>
+        <div class="lane grad" style="--tool:var(--pm)">
+          <div class="top"><h3>Profit Mind AI</h3><span class="role">Think</span></div>
+          <p>Business strategy, planning, and judgment calls — 18 specialist brains that reason commercially, unlike the general models.</p>
+          <div class="best" style="color:var(--pm-purple-bright)">Best for: business thinking</div>
+        </div>
+        <div class="lane" style="--tool:var(--cl)">
+          <div class="top"><h3>Claude</h3><span class="role">Build · daily driver</span></div>
+          <p>The workhorse. Best on the computer — files, execution, hands-on work, and long working sessions.</p>
+          <div class="best">Best for: building &amp; executing</div>
+        </div>
+        <div class="lane" style="--tool:var(--gp)">
+          <div class="top"><h3>ChatGPT</h3><span class="role">Research</span></div>
+          <p>Deep research you leave running in the background while you keep working in Claude.</p>
+          <div class="best">Best for: background deep research</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-break"></div>
+
+  <!-- ===== TABLE ===== -->
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="kicker">Cheat sheet</p>
+        <h2 class="h2">One-minute routing<span>.</span></h2>
+      </div>
+      <div class="table-scroll">
+        <table class="tbl">
+          <thead><tr><th>Situation</th><th>Open</th></tr></thead>
+          <tbody>
+            <tr><td>Random personal / health / everyday question</td><td><span class="pill" style="--tool:var(--pp)">Perplexity</span></td></tr>
+            <tr><td>Quick fact, price, or source to verify</td><td><span class="pill" style="--tool:var(--pp)">Perplexity</span></td></tr>
+            <tr><td>Business thinking, strategy, planning</td><td><span class="pill" style="--tool:var(--pm)">Profit Mind AI</span></td></tr>
+            <tr><td>Producing a deliverable (doc, framework, draft)</td><td><span class="pill" style="--tool:var(--pm)">Profit Mind</span> → <span class="pill" style="--tool:var(--cl)">Claude</span></td></tr>
+            <tr><td>Building, executing, files, computer work</td><td><span class="pill" style="--tool:var(--cl)">Claude</span></td></tr>
+            <tr><td>Deep research to leave running</td><td><span class="pill" style="--tool:var(--gp)">ChatGPT</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CTA BAND ===== -->
+  <section class="cta-band">
+    <div class="wrap">
+      <h2 class="h2">The one brain the others can't compete with<span>.</span></h2>
+      <p class="lead center">Perplexity, Claude and ChatGPT are brilliant tools. But for the business decisions that actually move the needle, you want a brain built to think commercially — that's the Business Brain Stack.</p>
+      <div class="btn-row center" style="margin-top:24px">
+        <a class="btn-primary" href="https://www.profitmindai.co.uk/business-brain-stack" target="_blank" rel="noopener">See the 18 Brains</a>
+        <a class="btn-secondary" href="https://www.profitmindai.co.uk/book" target="_blank" rel="noopener">Book a Call with Lewis</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand-col">
+        <div class="footer-logo-row">
+          <span class="footer-brand-name">Profit Mind AI</span>
+        </div>
+        <p class="footer-tagline">An entire AI executive team for business owners — plus done-for-you agents for LinkedIn and podcasts.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Explore</h4>
+        <a href="https://www.profitmindai.co.uk/business-brain-stack" target="_blank" rel="noopener">Brain Stack</a>
+        <a href="https://www.profitmindai.co.uk/linkedin-ai-agent">LinkedIn AI Agent</a>
+        <a href="https://www.profitmindai.co.uk/podcast-ai-agent">Podcast AI Agent</a>
+        <a href="https://www.profitmindai.co.uk/free-website">Free Website</a>
+        <a href="#">AI Tool Router</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="https://www.profitmindai.co.uk/about">About</a>
+        <a href="https://www.profitmindai.co.uk/testimonials">Testimonials</a>
+        <a href="https://www.profitmindai.co.uk/book" target="_blank" rel="noopener">Book a Call</a>
+        <a href="https://www.profitmindai.co.uk/privacy">Privacy Policy</a>
+        <a href="https://www.profitmindai.co.uk/terms">Terms</a>
+      </div>
+      <div class="footer-col">
+        <h4>Connect</h4>
+        <a href="https://www.linkedin.com/company/112615289" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="mailto:team@profitmindai.co.uk">team@profitmindai.co.uk</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-contact">The Mastermind Alliance Ltd · 2 Prospect Terrace, New Brancepeth, Durham, England, DH7 7EJ · <a href="mailto:team@profitmindai.co.uk">team@profitmindai.co.uk</a></p>
+      <p class="footer-copy">© 2026 Profit Mind AI, operated by The Mastermind Alliance Ltd. All prices in British Pounds Sterling (GBP). This is strategic analysis and decision intelligence, not legal, financial, or tax advice. Consult licensed professionals before executing major business decisions.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* Profit Mind AI — shared UI behaviour (nav + FAQ). Lightweight, no dependencies. */
+(function () {
+  // Mobile nav toggle
+  var toggle = document.querySelector('.nav-toggle');
+  var links = document.querySelector('.nav-links');
+  if (toggle && links) {
+    toggle.addEventListener('click', function () {
+      var open = links.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  }
+
+  // FAQ accordion
+  document.querySelectorAll('.faq-q').forEach(function (q) {
+    q.addEventListener('click', function () {
+      var item = q.closest('.faq-item');
+      var answer = item.querySelector('.faq-a');
+      var isOpen = item.classList.toggle('open');
+      q.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      answer.style.maxHeight = isOpen ? answer.scrollHeight + 'px' : null;
+    });
+  });
+})();
+
+</script>
+<script>
+(function () {
+  var nodes = {
+    start: { step: "Start here", q: "Is this personal, or business?", sub: "Personal stays in Perplexity — out of your business AIs' memory.",
+      options: [
+        { label: "Personal", sub: "A random question, health, shopping, curiosity", short: "Personal", to: "r_perp_personal" },
+        { label: "Business", sub: "Anything work, client, or strategy related", short: "Business", to: "biz" } ] },
+    biz: { step: "Business", q: "Thinking, doing, or just checking?", sub: "Your core split — it decides the tool.",
+      options: [
+        { label: "Thinking it through", sub: "Strategy, planning, a business judgment call", short: "Thinking", to: "biz_think" },
+        { label: "Doing the work", sub: "Building, executing, or researching", short: "Doing", to: "biz_do" },
+        { label: "Quick check", sub: "A fact, price, or source to verify", short: "Quick check", to: "r_perp_biz" } ] },
+    biz_think: { step: "Business → Thinking", q: "Just thinking, or producing something from it?", sub: "Pure strategy stays in Profit Mind AI; a deliverable hands off to Claude.",
+      options: [
+        { label: "Thinking / planning", sub: "I need the strategy or the judgment itself", short: "Plan", to: "r_profitmind" },
+        { label: "Producing a deliverable", sub: "A strategy doc, framework, or written draft", short: "Deliverable", to: "r_handoff" } ] },
+    biz_do: { step: "Business → Doing", q: "Hands-on, or research you can leave running?", sub: "Work in Claude; offload long research to ChatGPT.",
+      options: [
+        { label: "Hands-on work", sub: "Building, executing, files, computer workflow", short: "Hands-on", to: "r_claude" },
+        { label: "Deep research", sub: "A long report you leave running in the background", short: "Research", to: "r_chatgpt" } ] },
+
+    r_perp_personal: { result: true, tool: "pp", name: "Perplexity", tag: "Your personal AI.", mode: "Fast, cited answers",
+      why: "It keeps your random, everyday questions <b>out of your business AIs' memory and training</b> — and gives you a quick, sourced answer you don't have to overthink.",
+      examples: [ ["Is this supplement worth taking?"], ["What does this symptom usually mean?", " (it's not a doctor)"], ["What's the best way to clean this?"] ] },
+    r_perp_biz: { result: true, tool: "pp", name: "Perplexity", tag: "Quick fact-checker.", mode: "Fast, cited answers",
+      why: "For a neutral fact, price, or source you just need <b>verified fast</b>, Perplexity is quickest — the personal wall only applies to open-ended chatter, not sourced checks.",
+      examples: [ ["Verify this stat before I use it"], ["What's the going rate for X right now?"], ["Find a credible source for this claim"] ] },
+    r_profitmind: { result: true, tool: "pm", grad: true, name: "Profit Mind AI", tag: "18 specialist AI brains for business.", mode: "Business-native reasoning",
+      why: "It <b>reasons commercially</b> in a way Claude and ChatGPT don't — the right brain for strategy, positioning, and business judgment calls.",
+      examples: [ ["How should I price this offer?"], ["Pressure-test my positioning for this market"], ["Is this the right business move, and why?"] ] },
+    r_claude: { result: true, tool: "cl", name: "Claude", tag: "Your daily driver &amp; workhorse.", mode: "Files, Projects, hands-on work",
+      why: "Best <b>on the computer</b> — files, execution, and hands-on workflow — and your default for long working sessions. When in doubt on the doing side, this is home.",
+      examples: [ ["Build and edit this across my files"], ["Execute this workflow with me, step by step"], ["Work through this long piece section by section"] ] },
+    r_chatgpt: { result: true, tool: "gp", name: "ChatGPT", tag: "Background deep research.", mode: "Deep Research — runs in the background",
+      why: "Kick off the long research here and <b>leave it running</b> while you keep working in Claude. It's the tool you set going, not the one you sit in.",
+      examples: [ ["Compile a deep report on this topic"], ["Research the landscape while I work elsewhere"], ["Pull together everything on X, take your time"] ] },
+    r_handoff: { result: true, chain: true, name: "Think in Profit Mind AI → Build in Claude", tag: "A two-step handoff.",
+      why: "Do the strategic thinking where it's strongest, then hand the plan to your workhorse to turn into the finished deliverable.",
+      steps: [
+        { tool: "pm", ph: "1 · Think", name: "Profit Mind AI", note: "Shape the strategy, structure, and argument." },
+        { tool: "cl", ph: "2 · Build", name: "Claude", note: "Produce the doc, framework, or draft from it." } ] }
+  };
+
+  var TINT = { pp: ["var(--pp)","var(--pp-tint)","var(--pp-bd)"], pm: ["var(--pm)","var(--pm-tint)","var(--pm-bd)"], cl: ["var(--cl)","var(--cl-tint)","var(--cl-bd)"], gp: ["var(--gp)","var(--gp-tint)","var(--gp-bd)"] };
+
+  var path = [], stage = document.getElementById("stage"), trailEl = document.getElementById("trail");
+
+  function renderTrail() {
+    trailEl.innerHTML = "";
+    path.forEach(function (p, i) {
+      var c = document.createElement("span"); c.className = "router-crumb";
+      c.innerHTML = (i > 0 ? '<span class="a">→</span> ' : "") + "<b>" + p + "</b>";
+      trailEl.appendChild(c);
+    });
+  }
+  function toolVars(t) { var v = TINT[t]; return "--tool:" + v[0] + ";--tool-tint:" + v[1] + ";--tool-bd:" + v[2]; }
+
+  function go(key) {
+    var n = nodes[key];
+    stage.classList.remove("stage"); void stage.offsetWidth; stage.classList.add("stage");
+    if (n.result) renderResult(n); else renderQuestion(n);
+  }
+
+  function renderQuestion(n) {
+    var h = '<p class="step-label">' + n.step + '</p><h2 class="q">' + n.q + '</h2>';
+    if (n.sub) h += '<p class="q-sub">' + n.sub + '</p>';
+    h += '<div class="options">';
+    n.options.forEach(function (o) {
+      h += '<button class="opt" data-to="' + o.to + '" data-short="' + o.short + '"><span class="txt">' + o.label + (o.sub ? '<small>' + o.sub + '</small>' : '') + '</span><span class="chev" aria-hidden="true">→</span></button>';
+    });
+    h += '</div>';
+    if (path.length) h += '<div class="actions"><button class="rbtn" id="back">← Back</button><button class="rbtn" id="restart">Start over</button></div>';
+    stage.innerHTML = h;
+    Array.prototype.forEach.call(stage.querySelectorAll(".opt"), function (b) {
+      b.addEventListener("click", function () { path.push(b.getAttribute("data-short")); renderTrail(); go(b.getAttribute("data-to")); });
+    });
+    wireNav();
+  }
+
+  function renderResult(n) {
+    var h = "";
+    if (n.chain) {
+      h += '<p class="step-label">Recommended flow</p><h2 class="tool-name grad">' + n.name + '</h2><p class="tool-tag">' + n.tag + '</p><div class="chain">';
+      n.steps.forEach(function (s, i) {
+        if (i > 0) h += '<div class="chain-arrow" aria-hidden="true">→</div>';
+        h += '<div class="chain-step" style="' + toolVars(s.tool) + '"><span class="ph">' + s.ph + '</span><h4>' + s.name + '</h4><p>' + s.note + '</p></div>';
+      });
+      h += '</div><div class="why" style="--tool:var(--pm-purple-bright);--tool-tint:rgba(168,85,247,.14)">' + n.why + '</div>';
+    } else {
+      h += '<div style="' + toolVars(n.tool) + '">';
+      h += '<span class="badge">Recommendation</span>';
+      h += '<h2 class="tool-name' + (n.grad ? ' grad' : '') + '">' + n.name + '</h2>';
+      h += '<p class="tool-tag">' + n.tag + '</p>';
+      if (n.mode) h += '<div class="mode">◆ ' + n.mode + '</div>';
+      h += '<div class="why"><b>Why:</b> ' + n.why + '</div><ul class="examples">';
+      n.examples.forEach(function (e) { h += '<li><i>"' + e[0] + '"</i>' + (e[1] ? '<span>' + e[1] + '</span>' : '') + '</li>'; });
+      h += '</ul></div>';
+    }
+    h += '<div class="actions"><button class="rbtn primary" id="restart">Route another question</button><button class="rbtn" id="back">← Back</button></div>';
+    stage.innerHTML = h;
+    wireNav();
+  }
+
+  function wireNav() {
+    var back = document.getElementById("back"), restart = document.getElementById("restart");
+    if (back) back.addEventListener("click", function () { path.pop(); renderTrail(); rebuild(); });
+    if (restart) restart.addEventListener("click", function () {
+      path = []; renderTrail(); go("start");
+      document.querySelector(".router-card").scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+  }
+
+  function rebuild() {
+    var key = "start";
+    for (var i = 0; i < path.length; i++) {
+      var n = nodes[key]; if (!n.options) break;
+      var match = null;
+      for (var j = 0; j < n.options.length; j++) if (n.options[j].short === path[i]) { match = n.options[j]; break; }
+      if (!match) break; key = match.to;
+    }
+    go(key);
+  }
+
+  go("start");
+})();
+</script>
+</body>
+</html>
