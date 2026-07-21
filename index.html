@@ -583,9 +583,9 @@ img { max-width: 100%; display: block; }
       <div class="relay">
         <div class="relay-step grad" style="--tool:var(--pm)"><span class="ph">Think</span><strong>Profit Mind AI</strong><span>Strategy &amp; planning, in a business frame.</span></div>
         <div class="relay-arrow">→</div>
-        <div class="relay-step" style="--tool:var(--cl)"><span class="ph">Build</span><strong>Claude</strong><span>Turn the thinking into the actual work.</span></div>
+        <div class="relay-step" style="--tool:var(--cl)"><span class="ph">Build</span><strong>Claude Code</strong><span>Turn the thinking into the actual work.</span></div>
         <div class="relay-arrow">→</div>
-        <div class="relay-step" style="--tool:var(--gp)"><span class="ph">Offload</span><strong>ChatGPT</strong><span>Long research, running in the background.</span></div>
+        <div class="relay-step" style="--tool:var(--gp)"><span class="ph">Offload</span><strong>ChatGPT</strong><span>Deep Research, running in the background.</span></div>
       </div>
       <p class="sidecar"><b>Perplexity</b> sits off to the side — the personal AI and quick fact-checker, kept out of the business AIs' memory.</p>
     </div>
@@ -606,22 +606,22 @@ img { max-width: 100%; display: block; }
           <div class="loop-flow">
             <span class="tag" style="--tool:var(--pm)">Profit Mind AI</span><span class="flow-a">→</span>
             <span class="tag" style="--tool:var(--pp)">Perplexity</span><span class="flow-a">→</span>
-            <span class="tag" style="--tool:var(--cl)">Claude</span>
+            <span class="tag" style="--tool:var(--cl)">Claude Code</span>
           </div>
           <p><b>Strategise → verify → build.</b> A plan makes a claim; check the number or market fact before you commit, then build it out.</p>
         </div>
         <div class="loop">
           <div class="loop-flow">
             <span class="tag" style="--tool:var(--gp)">ChatGPT</span><span class="flow-a">→</span>
-            <span class="tag" style="--tool:var(--cl)">Claude</span>
+            <span class="tag" style="--tool:var(--cl)">Claude Code</span>
           </div>
           <p><b>Research → build.</b> Set the deep research running, then bring the findings into Claude to actually make something with them.</p>
         </div>
         <div class="loop">
           <div class="loop-flow">
-            <span class="tag" style="--tool:var(--cl)">Claude</span><span class="flow-a">→</span>
+            <span class="tag" style="--tool:var(--cl)">Claude Code</span><span class="flow-a">→</span>
             <span class="tag" style="--tool:var(--pm)">Profit Mind AI</span><span class="flow-a">→</span>
-            <span class="tag" style="--tool:var(--cl)">Claude</span>
+            <span class="tag" style="--tool:var(--cl)">Claude Code</span>
           </div>
           <p><b>Build → rethink → build.</b> Mid-build you hit a strategic fork — step out to Profit Mind AI for the call, then back to Claude to carry on.</p>
         </div>
@@ -650,13 +650,13 @@ img { max-width: 100%; display: block; }
           <div class="best" style="color:var(--pm-purple-bright)">Best for: business thinking</div>
         </div>
         <div class="lane" style="--tool:var(--cl)">
-          <div class="top"><h3>Claude</h3><span class="role">Build · daily driver</span></div>
-          <p>The workhorse. Best on the computer — files, execution, hands-on work, and long working sessions.</p>
+          <div class="top"><h3>Claude Code</h3><span class="role">Build · daily driver</span></div>
+          <p>The workhorse — and we mean <b>Claude Code</b> (works your files &amp; computer), not just the chat app. Best for execution, hands-on work and long sessions.</p>
           <div class="best">Best for: building &amp; executing</div>
         </div>
         <div class="lane" style="--tool:var(--gp)">
           <div class="top"><h3>ChatGPT</h3><span class="role">Research</span></div>
-          <p>Deep research you leave running in the background while you keep working in Claude.</p>
+          <p>ChatGPT <b>put to work</b> — Deep Research you leave running in the background while you keep working in Claude Code. Not casual chat.</p>
           <div class="best">Best for: background deep research</div>
         </div>
       </div>
@@ -679,8 +679,8 @@ img { max-width: 100%; display: block; }
             <tr><td>Random personal / health / everyday question</td><td><span class="pill" style="--tool:var(--pp)">Perplexity</span></td></tr>
             <tr><td>Quick fact, price, or source to verify</td><td><span class="pill" style="--tool:var(--pp)">Perplexity</span></td></tr>
             <tr><td>Business thinking, strategy, planning</td><td><span class="pill" style="--tool:var(--pm)">Profit Mind AI</span></td></tr>
-            <tr><td>Producing a deliverable (doc, framework, draft)</td><td><span class="pill" style="--tool:var(--pm)">Profit Mind</span> → <span class="pill" style="--tool:var(--cl)">Claude</span></td></tr>
-            <tr><td>Building, executing, files, computer work</td><td><span class="pill" style="--tool:var(--cl)">Claude</span></td></tr>
+            <tr><td>Producing a deliverable (doc, framework, draft)</td><td><span class="pill" style="--tool:var(--pm)">Profit Mind</span> → <span class="pill" style="--tool:var(--cl)">Claude Code</span></td></tr>
+            <tr><td>Building, executing, files, computer work</td><td><span class="pill" style="--tool:var(--cl)">Claude Code</span></td></tr>
             <tr><td>Deep research to leave running</td><td><span class="pill" style="--tool:var(--gp)">ChatGPT</span></td></tr>
           </tbody>
         </table>
@@ -797,17 +797,17 @@ img { max-width: 100%; display: block; }
     r_profitmind: { result: true, tool: "pm", grad: true, name: "Profit Mind AI", tag: "18 specialist AI brains for business.", mode: "Business-native reasoning",
       why: "It <b>reasons commercially</b> in a way Claude and ChatGPT don't — the right brain for strategy, positioning, and business judgment calls.",
       examples: [ ["How should I price this offer?"], ["Pressure-test my positioning for this market"], ["Is this the right business move, and why?"] ] },
-    r_claude: { result: true, tool: "cl", name: "Claude", tag: "Your daily driver &amp; workhorse.", mode: "Files, Projects, hands-on work",
-      why: "Best <b>on the computer</b> — files, execution, and hands-on workflow — and your default for long working sessions. When in doubt on the doing side, this is home.",
+    r_claude: { result: true, tool: "cl", name: "Claude Code", tag: "Your daily driver &amp; workhorse.", mode: "Claude Code — not just the chat app",
+      why: "We mean <b>Claude Code</b> specifically — the one that works across your files, terminal and computer, not just the chat window. Best for execution and hands-on workflow, and your default for long working sessions. When in doubt on the doing side, this is home.",
       examples: [ ["Build and edit this across my files"], ["Execute this workflow with me, step by step"], ["Work through this long piece section by section"] ] },
-    r_chatgpt: { result: true, tool: "gp", name: "ChatGPT", tag: "Background deep research.", mode: "Deep Research — runs in the background",
-      why: "Kick off the long research here and <b>leave it running</b> while you keep working in Claude. It's the tool you set going, not the one you sit in.",
+    r_chatgpt: { result: true, tool: "gp", name: "ChatGPT", tag: "Background deep research.", mode: "ChatGPT put to work — Deep Research, not casual chat",
+      why: "We mean ChatGPT <b>put to work</b> — Deep Research running in the background — not quick casual chat. Kick it off here and leave it running while you keep working in Claude Code; it's the tool you set going, not the one you sit in.",
       examples: [ ["Compile a deep report on this topic"], ["Research the landscape while I work elsewhere"], ["Pull together everything on X, take your time"] ] },
-    r_handoff: { result: true, chain: true, name: "Think in Profit Mind AI → Build in Claude", tag: "A two-step handoff.",
+    r_handoff: { result: true, chain: true, name: "Think in Profit Mind AI → Build in Claude Code", tag: "A two-step handoff.",
       why: "Do the strategic thinking where it's strongest, then hand the plan to your workhorse to turn into the finished deliverable.",
       steps: [
         { tool: "pm", ph: "1 · Think", name: "Profit Mind AI", note: "Shape the strategy, structure, and argument." },
-        { tool: "cl", ph: "2 · Build", name: "Claude", note: "Produce the doc, framework, or draft from it." } ] }
+        { tool: "cl", ph: "2 · Build", name: "Claude Code", note: "Produce the doc, framework, or draft from it." } ] }
   };
 
   var TINT = { pp: ["var(--pp)","var(--pp-tint)","var(--pp-bd)"], pm: ["var(--pm)","var(--pm-tint)","var(--pm-bd)"], cl: ["var(--cl)","var(--cl-tint)","var(--cl-bd)"], gp: ["var(--gp)","var(--gp-tint)","var(--gp-bd)"] };
